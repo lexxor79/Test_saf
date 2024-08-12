@@ -117,7 +117,7 @@ function generateAllJSON() {
                         serialNumbers: [
                             {
                                 sn: row.cells[25].querySelector("input")?.value || '',
-                                status: row.cells[26].querySelector("input")?.value || ''
+                                // status: row.cells[26].querySelector("input")?.value || ''
                             }
                         ]
                     }
