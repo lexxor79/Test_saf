@@ -4,6 +4,23 @@ function toggleBurgerMenu() {
     sidebar.classList.toggle('open');
 }
 
+// Fonction pour charger les données du menu depuis un fichier JSON
+async function loadMenuData() {
+    try {
+        const response = await fetch('menuData.json'); // Assurez-vous que ce fichier existe
+        const data = await response.json();
+
+        document.getElementById('company').textContent = `Company: ${data.company}`;
+        document.getElementById('factory').textContent = `Factory: ${data.factory}`;
+        document.getElementById('workshop').textContent = `Workshop: ${data.workshop}`;
+        document.getElementById('productionUnit').textContent = `Production Unit: ${data.productionUnit}`;
+        document.getElementById('productionMachine').textContent = `Production Machine: ${data.productionMachine}`;
+        document.getElementById('supervisor').textContent = `Supervisor: ${data.supervisor}`;
+    } catch (error) {
+        console.error('Erreur lors du chargement des données du menu:', error);
+    }
+}
+
 // Fonction pour modifier les informations du menu de gauche
 function editInfo() {
     const newCompany = prompt("Modifier Company", "SAFRAN");
@@ -67,40 +84,40 @@ function generateAllJSON() {
     rows.forEach((row, index) => {
         const shouldGenerate = row.querySelector(".generateJson").checked;
         if (shouldGenerate) {
-            const ofNr = row.cells[11].querySelector("input").value; // Extract OF Number
+            const ofNr = row.cells[11].querySelector("input")?.value || ''; // Extract OF Number
             const timestamp = Math.floor(Date.now() / 1000); // Generate Timestamp
 
             const data = {
-                request: row.cells[1].querySelector("input").value,
-                requestVersion: row.cells[2].querySelector("input").value,
-                requestDate: row.cells[3].querySelector("input").value,
-                company: row.cells[4].querySelector("input").value,
-                factory: row.cells[5].querySelector("input").value,
-                workshop: row.cells[6].querySelector("input").value,
-                productionUnit: row.cells[7].querySelector("input").value,
-                productionMachine: row.cells[8].querySelector("input").value,
-                supervisor: row.cells[9].querySelector("input").value,
+                request: row.cells[1].querySelector("input")?.value || '',
+                requestVersion: row.cells[2].querySelector("input")?.value || '',
+                requestDate: row.cells[3].querySelector("input")?.value || '',
+                company: row.cells[4].querySelector("input")?.value || '',
+                factory: row.cells[5].querySelector("input")?.value || '',
+                workshop: row.cells[6].querySelector("input")?.value || '',
+                productionUnit: row.cells[7].querySelector("input")?.value || '',
+                productionMachine: row.cells[8].querySelector("input")?.value || '',
+                supervisor: row.cells[9].querySelector("input")?.value || '',
                 orders: [
                     {
-                        user: row.cells[10].querySelector("input").value,
+                        user: row.cells[10].querySelector("input")?.value || '',
                         ofNr: ofNr,
-                        releaseDate: row.cells[12].querySelector("input").value,
-                        dueDate: row.cells[13].querySelector("input").value,
-                        orderGroupId: row.cells[14].querySelector("input").value,
-                        nOrders: parseInt(row.cells[15].querySelector("input").value),
-                        priority: parseInt(row.cells[16].querySelector("input").value),
-                        partsNbr: parseInt(row.cells[17].querySelector("input").value),
-                        opsNbr: parseInt(row.cells[18].querySelector("input").value),
-                        partReference: row.cells[19].querySelector("input").value,
-                        partDescrip: row.cells[20].querySelector("input").value,
-                        manufactRoutingCode: row.cells[21].querySelector("input").value,
-                        manufactRoutingVersion: parseFloat(row.cells[22].querySelector("input").value).toFixed(1),
-                        ofMBomCode: parseInt(row.cells[23].querySelector("input").value),
-                        ofMBomVersion: parseInt(row.cells[24].querySelector("input").value),
+                        releaseDate: row.cells[12].querySelector("input")?.value || '',
+                        dueDate: row.cells[13].querySelector("input")?.value || '',
+                        orderGroupId: row.cells[14].querySelector("input")?.value || '',
+                        nOrders: parseInt(row.cells[15].querySelector("input")?.value || 0),
+                        priority: parseInt(row.cells[16].querySelector("input")?.value || 0),
+                        partsNbr: parseInt(row.cells[17].querySelector("input")?.value || 0),
+                        opsNbr: parseInt(row.cells[18].querySelector("input")?.value || 0),
+                        partReference: row.cells[19].querySelector("input")?.value || '',
+                        partDescrip: row.cells[20].querySelector("input")?.value || '',
+                        manufactRoutingCode: row.cells[21].querySelector("input")?.value || '',
+                        manufactRoutingVersion: parseFloat(row.cells[22].querySelector("input")?.value || '0').toFixed(1),
+                        ofMBomCode: parseInt(row.cells[23].querySelector("input")?.value || 0),
+                        ofMBomVersion: parseInt(row.cells[24].querySelector("input")?.value || 0),
                         serialNumbers: [
                             {
-                                sn: row.cells[25].querySelector("input").value,
-                                status: row.cells[26].querySelector("input").value
+                                sn: row.cells[25].querySelector("input")?.value || '',
+                                status: row.cells[26].querySelector("input")?.value || ''
                             }
                         ]
                     }
@@ -153,16 +170,21 @@ function saveJsonPath() {
 
 // Charger les données du menu au chargement de la page
 document.addEventListener('DOMContentLoaded', function() {
-    loadMenuData();
+    loadMenuData();  // Cette fonction doit maintenant exister
 
-    // Ajouter un événement pour le formulaire d'ajout de ligne
-    document.getElementById('jsonForm').addEventListener('submit', function(event) {
-        event.preventDefault();
+    // Vérifiez que le formulaire existe avant d'ajouter l'événement
+    const jsonForm = document.getElementById('jsonForm');
+    if (jsonForm) {
+        jsonForm.addEventListener('submit', function(event) {
+            event.preventDefault();
 
-        const id = document.getElementById('id').value;
-        const name = document.getElementById('name').value;
-        const quantity = document.getElementById('quantity').value;
+            const id = document.getElementById('id').value;
+            const name = document.getElementById('name').value;
+            const quantity = document.getElementById('quantity').value;
 
-        addRowToTable(id, name, quantity);
-    });
+            addRowToTable(id, name, quantity);
+        });
+    } else {
+        console.error("Le formulaire jsonForm n'existe pas.");
+    }
 });
