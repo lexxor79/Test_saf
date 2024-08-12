@@ -1,8 +1,9 @@
 // Fonction pour basculer le menu burger
 function toggleBurgerMenu() {
-    const sidebar = document.querySelector('.sidebar');
-    sidebar.classList.toggle('open');
+    const popup = document.getElementById('burgerMenuPopup');
+    popup.classList.toggle('open');
 }
+
 
 // Fonction pour charger les données du menu depuis un fichier JSON
 async function loadMenuData() {
