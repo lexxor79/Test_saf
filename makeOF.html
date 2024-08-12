@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MakeOf - SAFRAN</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="burger-menu" onclick="toggleBurgerMenu()">☰</div>
+        <h1>MakeOf</h1>
+    </header>
+    <div class="container">
+       <nav class="sidebar">
+    <ul>
+        <li id="company">Company: SAFRAN</li>
+        <li id="factory">Factory: NIORT</li>
+        <li id="workshop">Workshop: ENGINeUS</li>
+        <li id="productionUnit">Production Unit: SmartPL3</li>
+        <li id="productionMachine">Production Machine: Magasin Bord de Ligne</li>
+        <li id="supervisor">Supervisor: MES</li>
+        <li><button onclick="editInfo()">Modifier</button></li>
+    </ul>
+</nav>
+        <main>
+            <h1>Génération de JSON</h1>
+            <form id="jsonForm">
+                <table id="jsonTable">
+                    <thead>
+                        <tr>
+                            <th>Générer</th>
+                            <th>Request</th>
+                            <th>Request Version</th>
+                            <th>Request Date (Timestamp)</th>
+                            <th>Company</th>
+                            <th>Factory</th>
+                            <th>Workshop</th>
+                            <th>Production Unit</th>
+                            <th>Production Machine</th>
+                            <th>Supervisor</th>
+                            <th>User</th>
+                            <th>OF Nr</th>
+                            <th>Release Date (Timestamp)</th>
+                            <th>Due Date (Timestamp)</th>
+                            <th>Order Group ID</th>
+                            <th>nOrders</th>
+                            <th>Priority</th>
+                            <th>Parts Number</th>
+                            <th>Ops Number</th>
+                            <th>Part Reference</th>
+                            <th>Part Description</th>
+                            <th>Manufacturing Routing Code</th>
+                            <th>Manufacturing Routing Version</th>
+                            <th>OF MBOM Code</th>
+                            <th>OF MBOM Version</th>
+                            <th>Serial Number</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jsonRows">
+                        <tr>
+                            <td><input type="checkbox" class="generateJson"></td>
+                            <td><input type="text" value="MakeOF"></td>
+                            <td><input type="text" value="0.0"></td>
+                            <td><input type="text" value="1691111894"></td>
+                            <td><input type="text" value="SAFRAN"></td>
+                            <td><input type="text" value="NIORT"></td>
+                            <td><input type="text" value="ENGINeUS"></td>
+                            <td><input type="text" value="SmartPL3"></td>
+                            <td><input type="text" value="Magasin Bord de Ligne"></td>
+                            <td><input type="text" value="MES"></td>
+                            <td><input type="text" value="FOULONJeremy"></td>
+                            <td><input type="text" value="OFN-10000178"></td>
+                            <td><input type="text" value="1688999932"></td>
+                            <td><input type="text" value="1706214110"></td>
+                            <td><input type="text" value=""></td>
+                            <td><input type="number" value="0"></td>
+                            <td><input type="number" value="1"></td>
+                            <td><input type="number" value="1"></td>
+                            <td><input type="number" value="1"></td>
+                            <td><input type="text" value="TestVisionAuto001"></td>
+                            <td><input type="text" value="TestVision15pict"></td>
+                            <td><input type="text" value="TestVision15pict001"></td>
+                            <td><input type="text" value="1.0"></td>
+                            <td><input type="number" value="0"></td>
+                            <td><input type="number" value="0"></td>
+                            <td><input type="text" value="N/A"></td>
+                            <td><input type="text" value=""></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <button type="button" onclick="addRow()">Ajouter une ligne</button>
+                <button type="button" onclick="generateAllJSON()">Générer JSON</button>
+            </form>
+
+            <h2>JSON Généré</h2>
+            <pre id="jsonOutput"></pre>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
