@@ -1,10 +1,28 @@
-// Ces fonctions doivent être globales pour être accessibles depuis le HTML
+// Fonction pour basculer le menu burger
 function toggleBurgerMenu() {
     const sidebar = document.querySelector('.sidebar');
     sidebar.classList.toggle('open');
 }
 
-function editInfo() {
+// Fonction pour lire les données du menu depuis un fichier JSON
+async function loadMenuData() {
+    try {
+        const response = await fetch('menuData.json');
+        const data = await response.json();
+        
+        document.getElementById('company').textContent = `Company: ${data.company}`;
+        document.getElementById('factory').textContent = `Factory: ${data.factory}`;
+        document.getElementById('workshop').textContent = `Workshop: ${data.workshop}`;
+        document.getElementById('productionUnit').textContent = `Production Unit: ${data.productionUnit}`;
+        document.getElementById('productionMachine').textContent = `Production Machine: ${data.productionMachine}`;
+        document.getElementById('supervisor').textContent = `Supervisor: ${data.supervisor}`;
+    } catch (error) {
+        console.error('Erreur lors du chargement des données du menu:', error);
+    }
+}
+
+// Fonction pour modifier les informations du menu de gauche
+async function editInfo() {
     const newCompany = prompt("Modifier Company", "SAFRAN");
     const newFactory = prompt("Modifier Factory", "NIORT");
     const newWorkshop = prompt("Modifier Workshop", "ENGINeUS");
@@ -12,20 +30,53 @@ function editInfo() {
     const newProductionMachine = prompt("Modifier Production Machine", "Magasin Bord de Ligne");
     const newSupervisor = prompt("Modifier Supervisor", "MES");
 
-    document.querySelectorAll('.sidebar ul li:nth-child(1)').forEach(el => el.textContent = `Company: ${newCompany}`);
-    document.querySelectorAll('.sidebar ul li:nth-child(2)').forEach(el => el.textContent = `Factory: ${newFactory}`);
-    document.querySelectorAll('.sidebar ul li:nth-child(3)').forEach(el => el.textContent = `Workshop: ${newWorkshop}`);
-    document.querySelectorAll('.sidebar ul li:nth-child(4)').forEach(el => el.textContent = `Production Unit: ${newProductionUnit}`);
-    document.querySelectorAll('.sidebar ul li:nth-child(5)').forEach(el => el.textContent = `Production Machine: ${newProductionMachine}`);
-    document.querySelectorAll('.sidebar ul li:nth-child(6)').forEach(el => el.textContent = `Supervisor: ${newSupervisor}`);
+    const newData = {
+        company: newCompany,
+        factory: newFactory,
+        workshop: newWorkshop,
+        productionUnit: newProductionUnit,
+        productionMachine: newProductionMachine,
+        supervisor: newSupervisor
+    };
+
+    // Mise à jour du menu avec les nouvelles valeurs
+    document.getElementById('company').textContent = `Company: ${newData.company}`;
+    document.getElementById('factory').textContent = `Factory: ${newData.factory}`;
+    document.getElementById('workshop').textContent = `Workshop: ${newData.workshop}`;
+    document.getElementById('productionUnit').textContent = `Production Unit: ${newData.productionUnit}`;
+    document.getElementById('productionMachine').textContent = `Production Machine: ${newData.productionMachine}`;
+    document.getElementById('supervisor').textContent = `Supervisor: ${newData.supervisor}`;
+
+    // Enregistrement des nouvelles données dans le fichier JSON
+    saveMenuData(newData);
 }
 
-// Encapsulez les autres logiques liées à DOMContentLoaded
-document.addEventListener('DOMContentLoaded', function() {
-    let data = [];
-    let jsonPath = '/chemin/vers/dossier'; // Chemin par défaut
+// Fonction pour enregistrer les données modifiées dans le fichier JSON
+async function saveMenuData(data) {
+    try {
+        const response = await fetch('saveMenuData.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
 
-    document.getElementById('addRowForm').addEventListener('submit', function(event) {
+        if (!response.ok) {
+            throw new Error('Erreur lors de l\'enregistrement des données');
+        }
+        alert('Données enregistrées avec succès');
+    } catch (error) {
+        console.error('Erreur lors de l\'enregistrement des données du menu:', error);
+    }
+}
+
+// Charger les données du menu au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+    loadMenuData();
+
+    // Fonctionnalités spécifiques à MakeOF
+    document.getElementById('jsonForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
         const id = document.getElementById('id').value;
@@ -36,39 +87,56 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function addRowToTable(id, name, quantity) {
-        const tableBody = document.getElementById('makeofTable').getElementsByTagName('tbody')[0];
-        const newRow = tableBody.insertRow();
-        
-        const cell1 = newRow.insertCell(0);
-        const cell2 = newRow.insertCell(1);
-        const cell3 = newRow.insertCell(2);
+        const tableBody = document.getElementById('jsonRows');
+        const newRow = document.createElement('tr');
 
-        cell1.textContent = id;
-        cell2.textContent = name;
-        cell3.textContent = quantity;
+        newRow.innerHTML = `
+            <td><input type="checkbox" class="generateJson"></td>
+            <td><input type="text" value="${id}"></td>
+            <td><input type="text" value="${name}"></td>
+            <td><input type="text" value="${quantity}"></td>
+        `;
 
-        data.push({ id, name, quantity });
+        tableBody.appendChild(newRow);
     }
 
-    function generateAndSaveJSON() {
-        const jsonData = JSON.stringify(data, null, 2);
-        const blob = new Blob([jsonData], { type: 'application/json' });
-        
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `makeof.json`; // Nom du fichier
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    function generateAllJSON() {
+        const rows = document.querySelectorAll("#jsonRows tr");
+        let allJsons = [];
+
+        rows.forEach((row, index) => {
+            const shouldGenerate = row.querySelector(".generateJson").checked;
+            if (shouldGenerate) {
+                const ofNr = row.cells[1].querySelector("input").value;
+                const timestamp = Math.floor(Date.now() / 1000);
+
+                const data = {
+                    request: row.cells[1].querySelector("input").value,
+                    requestVersion: row.cells[2].querySelector("input").value,
+                    requestDate: row.cells[3].querySelector("input").value,
+                    // Ajoutez les autres champs ici
+                };
+
+                allJsons.push(data);
+
+                const filename = `R105_OF_${ofNr}_${timestamp}.json`;
+                downloadJSON(data, filename);
+            }
+        });
+
+        const lastJsonString = JSON.stringify(allJsons[allJsons.length - 1], null, 4);
+        document.getElementById('jsonOutput').textContent = lastJsonString;
     }
 
-    function saveJsonPath() {
-        const newPath = document.getElementById('jsonPath').value;
-        if (newPath) {
-            jsonPath = newPath;
-            alert('Chemin d\'enregistrement mis à jour : ' + jsonPath);
-        } else {
-            alert('Veuillez entrer un chemin valide.');
-        }
+    function downloadJSON(jsonData, fileName) {
+        const jsonString = JSON.stringify(jsonData, null, 4);
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 });
